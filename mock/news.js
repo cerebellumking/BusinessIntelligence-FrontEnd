@@ -17,27 +17,27 @@ module.exports = [
           'date': '2019-06-17'
         },
         {
-          'count': 1,
+          'count': 4,
           'date': '2019-06-18'
         },
         {
-          'count': 1,
+          'count': 7,
           'date': '2019-06-19'
         },
         {
-          'count': 2,
+          'count': 8,
           'date': '2019-06-20'
         },
         {
-          'count': 2,
+          'count': 3,
           'date': '2019-06-21'
         },
         {
-          'count': 1,
+          'count': 10,
           'date': '2019-06-23'
         },
         {
-          'count': 1,
+          'count': 9,
           'date': '2019-06-24'
         }
       ]

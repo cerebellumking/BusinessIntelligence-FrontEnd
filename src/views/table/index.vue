@@ -45,7 +45,7 @@
 
 <script>
 import { getList } from '@/api/table'
-
+let szb = null
 export default {
   filters: {
     statusFilter(status) {
@@ -65,6 +65,24 @@ export default {
   },
   created() {
     this.fetchData()
+  },
+  mounted() {
+    // websocket
+    szb = new WebSocket('ws://127.0.0.1:8081/test/')
+    szb.onopen = () => {
+      console.log('websocket open')
+    }
+    szb.onmessage = (e) => {
+      console.log('收到消息')
+      console.log(e.data)
+    }
+    szb.onclose = () => {
+      console.log('websocket close')
+    }
+    setTimeout(() => {
+      console.log('发送消息')
+      szb.send('hello')
+    }, 2000)
   },
   methods: {
     fetchData() {

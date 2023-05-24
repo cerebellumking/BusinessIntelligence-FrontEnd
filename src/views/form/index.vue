@@ -43,8 +43,8 @@
       </el-form>
 
     </el-row>
-    <el-row span="20">
-      博哥好强
+    <el-row v-if="showEcharts" span="20">
+      <div id="chart" style="width: 80vw; height: 80vh" />
     </el-row>
   </div>
 </template>
@@ -56,7 +56,7 @@ import { mockGetNewsFashion } from '@/api/news'
 export default {
   data() {
     return {
-      newsList: [],
+      showEcharts: true,
       form: {
         newsId: '',
         headline: '',
@@ -70,6 +70,9 @@ export default {
       return this.form.newsId !== '' && this.form.headline !== '' && this.form.startDate !== '' && this.form.endDate !== ''
     }
   },
+  mounted() {
+    this.initEcharts()
+  },
   methods: {
     handleSelect(item) {
       this.form.newsId = item.label
@@ -79,7 +82,6 @@ export default {
       // mock
       mockGetSuggestNews().then(res => {
         console.log(res)
-        this.newsList = res.data
         const results = res.data.map(item => {
           return {
             label: item.news_id,
@@ -96,9 +98,43 @@ export default {
       if (this.isInput) {
         const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
         const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
+        // this.$axios
+        //   .get('/news/fashion', {
+        //     params: {
+        //       start_ts: start_ts,
+        //       end_ts: end_ts,
+        //       news_id: form.newsId
+        //     }
+        //   }).then(res => {
+        //     console.log(res)
+        //   }).catch(err => {
+        //     console.log(err)
+        //   })
         // mock
         mockGetNewsFashion(start_ts, end_ts, form.newsId).then(res => {
           console.log(res)
+          this.showEcharts = true
+          this.$echarts.init(document.getElementById('chart')).setOption({
+            xAxis: {
+              type: 'category', // 离散数据
+              data: res.data.map(item => item.date),
+              name: '日期'
+            },
+            yAxis: {
+              type: 'value'
+            },
+            tooltip: {
+              trigger: 'axis', // 设置触发类型为坐标轴轴线触发
+              formatter: '{b}: {c}' // 自定义工具提示的内容格式
+            },
+            series: [
+              {
+                data: res.data.map(item => item.count),
+                type: 'line',
+                smooth: true
+              }
+            ]
+          })
         }).catch(err => {
           console.log(err)
         })
@@ -108,6 +144,9 @@ export default {
           type: 'warning'
         })
       }
+    },
+    initEcharts() {
+
     }
   }
 }
