@@ -51,7 +51,7 @@
 
 <script>
 import { mockGetSuggestNews } from '@/api/suggest'
-import { mockGetNewsFashion } from '@/api/news'
+import { mockGetSingleNewsFashion } from '@/api/news'
 
 export default {
   data() {
@@ -111,7 +111,7 @@ export default {
         //     console.log(err)
         //   })
         // mock
-        mockGetNewsFashion(start_ts, end_ts, form.newsId).then(res => {
+        mockGetSingleNewsFashion(start_ts, end_ts, form.newsId).then(res => {
           console.log(res)
           this.showEcharts = true
           this.$echarts.init(document.getElementById('chart')).setOption({
