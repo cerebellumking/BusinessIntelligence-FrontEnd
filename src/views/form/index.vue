@@ -51,30 +51,41 @@
 
 <script>
 import { mockGetSuggestNews } from '@/api/suggest'
+import { mockGetNewsFashion } from '@/api/news'
 
 export default {
   data() {
     return {
+      newsList: [],
       form: {
+        newsId: '',
         headline: '',
         startDate: '',
         endDate: ''
       }
     }
   },
+  computed: {
+    isInput() {
+      return this.form.newsId !== '' && this.form.headline !== '' && this.form.startDate !== '' && this.form.endDate !== ''
+    }
+  },
   methods: {
     handleSelect(item) {
-      console.log(item)
+      this.form.newsId = item.label
+      this.form.headline = item.value
     },
     getSuggestNews(queryString, cb) {
+      // mock
       mockGetSuggestNews().then(res => {
-        console.log(res.data)
-        var results = []
-        for (var i = 0; i < res.data.length; i++) {
-          results.push({
-            value: res.data[i]
-          })
-        }
+        console.log(res)
+        this.newsList = res.data
+        const results = res.data.map(item => {
+          return {
+            label: item.news_id,
+            value: item.headline
+          }
+        })
         cb(results)
       }).catch(err => {
         console.log(err)
@@ -82,14 +93,26 @@ export default {
     },
     search(form) {
       console.log(form)
+      if (this.isInput) {
+        const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
+        const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
+        // mock
+        mockGetNewsFashion(start_ts, end_ts, form.newsId).then(res => {
+          console.log(res)
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.$message({
+          message: '请填写完整信息',
+          type: 'warning'
+        })
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.line{
-  text-align: center;
-}
 </style>
 
