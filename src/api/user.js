@@ -22,3 +22,18 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function mockGetUserInterestChanging(start_ts, end_ts, news_id) {
+  console.log(news_id, start_ts, end_ts)
+  return request({
+    url: '/user/interest',
+    method: 'get'
+  })
+}
+
+export function mockGetUserIdRange() {
+  return request({
+    url: '/range/userid',
+    method: 'get'
+  })
+}

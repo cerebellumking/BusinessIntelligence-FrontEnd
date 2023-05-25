@@ -6,14 +6,13 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="新闻标题" style="display: inline-block !important">
-          <el-autocomplete
-            v-model="form.headline"
-            :fetch-suggestions="getSuggestNews"
-            placeholder="请输入新闻关键词"
-            style="width: 20vw"
-            clearable
-            @select="handleSelect"
+        <el-form-item label="用户id" style="display: inline-block !important">
+          <el-input-number
+            v-model="form.userId"
+            :max="userIdRange.max"
+            :min="userIdRange.min"
+            controls-position="right"
+            style="width: 146px"
           />
         </el-form-item>
         <el-form-item label="起始时间" style="display: inline-block !important; margin-left:5vw">
@@ -43,23 +42,24 @@
       </el-form>
 
     </el-row>
-    <el-row v-if="showEcharts" span="20">
+    <el-row span="20">
       <div id="chart" style="width: 80vw; height: 80vh" />
     </el-row>
   </div>
 </template>
 
 <script>
-import { mockGetSuggestNews } from '@/api/suggest'
-import { mockGetSingleNewsFashion } from '@/api/news'
+import { mockGetUserInterestChanging, mockGetUserIdRange } from '@/api/user'
 
 export default {
   data() {
     return {
-      showEcharts: true,
+      userIdRange: {
+        min: '',
+        max: ''
+      },
       form: {
-        newsId: '',
-        headline: '',
+        userId: '',
         startDate: '',
         endDate: ''
       }
@@ -67,58 +67,29 @@ export default {
   },
   computed: {
     isInput() {
-      return this.form.newsId !== '' && this.form.headline !== '' && this.form.startDate !== '' && this.form.endDate !== ''
+      return this.form.userId !== '' && this.form.startDate !== '' && this.form.endDate !== ''
     }
   },
   mounted() {
-    this.initEcharts()
+    mockGetUserIdRange().then(res => {
+      console.log(res)
+      this.userIdRange.min = res.data[0].min_user_id
+      this.userIdRange.max = res.data[0].max_user_id
+    })
   },
   methods: {
-    handleSelect(item) {
-      this.form.newsId = item.label
-      this.form.headline = item.value
-    },
-    getSuggestNews(queryString, cb) {
-      // mock
-      mockGetSuggestNews().then(res => {
-        console.log(res)
-        const results = res.data.map(item => {
-          return {
-            label: item.news_id,
-            value: item.headline
-          }
-        })
-        cb(results)
-      }).catch(err => {
-        console.log(err)
-      })
-    },
     search(form) {
-      console.log(form)
       if (this.isInput) {
         const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
         const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
-        // this.$axios
-        //   .get('/news/fashion', {
-        //     params: {
-        //       start_ts: start_ts,
-        //       end_ts: end_ts,
-        //       news_id: form.newsId
-        //     }
-        //   }).then(res => {
-        //     console.log(res)
-        //   }).catch(err => {
-        //     console.log(err)
-        //   })
         // mock
-        mockGetSingleNewsFashion(start_ts, end_ts, form.newsId).then(res => {
+        mockGetUserInterestChanging(start_ts, end_ts, form.userId).then(res => {
           console.log(res)
-          this.showEcharts = true
           this.$echarts.init(document.getElementById('chart')).setOption({
             xAxis: {
               type: 'category', // 离散数据
-              data: res.data.map(item => item.date),
-              name: '日期'
+              data: res.data.map(item => item.category),
+              name: '类别'
             },
             yAxis: {
               type: 'value'
@@ -144,9 +115,6 @@ export default {
           type: 'warning'
         })
       }
-    },
-    initEcharts() {
-
     }
   }
 }
