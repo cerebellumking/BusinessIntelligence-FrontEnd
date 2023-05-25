@@ -1,10 +1,8 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form
-        label-width="100px"
-      >
-        <el-form-item label="用户id" style="display: inline-block !important">
+      <el-form inline>
+        <el-form-item label="用户id">
           <el-input-number
             v-model="userId"
             :max="userIdRange.max"
@@ -12,19 +10,18 @@
             controls-position="right"
           />
         </el-form-item>
-        <el-form-item style="display: inline-block !important">
+        <el-form-item>
           <el-button
             type="primary"
             size="large"
-            style="margin-left:5vw; display: inline-block !important"
             @click="search()"
           >查询</el-button>
         </el-form-item>
       </el-form>
     </el-row>
-    <el-row v-if="newsClicked.length !== 0" span="20">
-      <el-divider>历史点击记录：</el-divider>
-      <el-table :data="newsClicked" style="width: 100%">
+    <el-row v-if="newsClicked.length !== 0">
+      <el-divider>历史点击记录</el-divider>
+      <el-table :data="newsClicked" style="width: 100%; height: 500px" max-height="500px" stripe>
         <el-table-column prop="news_id" label="news_id" width="180" />
         <el-table-column prop="headline" label="headline" />
         <el-table-column prop="date" label="date" width="180" />
@@ -42,9 +39,9 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-row v-if="newsRecommended.length !== 0" span="20">
-      <el-divider>新闻推荐：</el-divider>
-      <el-table :data="newsRecommended" style="width: 100%">
+    <el-row v-if="newsRecommended.length !== 0">
+      <el-divider>新闻推荐</el-divider>
+      <el-table :data="newsRecommended" style="width: 100%; height: 500px" max-height="500px" stripe>
         <el-table-column prop="news_id" label="news_id" width="180" />
         <el-table-column prop="category" label="category" width="180" />
         <el-table-column prop="topic" label="topic" width="180" />
@@ -63,10 +60,11 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-dialog :visible.sync="dialogVisible">
-      <span>headline: {{ headline }}</span>
-      <br>content:<br>
-      <span>{{ content }}</span>
+    <el-dialog :visible.sync="dialogVisible" align-center center draggable width="90%">
+      <template slot="title">
+        <span class="news-headline">{{ headline }}</span>
+      </template>
+      <span class="news-content">{{ content }}</span>
     </el-dialog>
   </div>
 </template>
@@ -143,6 +141,28 @@ export default {
 }
 </script>
 
-  <style scoped>
-  </style>
+<style scoped>
+.el-form-item {
+  margin-left: 10px;
+  margin-right: 10px;
+flex-shrink: 0;
+}
+.el-col > .el-row {
+  display: flex;
+  width: 100%;
+}
+.news-headline {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.news-content {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+}
+</style>
 

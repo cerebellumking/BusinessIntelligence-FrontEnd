@@ -1,48 +1,44 @@
 <template>
   <div class="app-container">
-    <el-row>
-      <el-form
-        ref="form"
-        :model="form"
-        label-width="100px"
-      >
-        <el-form-item label="新闻标题" style="display: inline-block !important">
-          <el-autocomplete
-            v-model="form.headline"
-            :fetch-suggestions="getSuggestNews"
-            placeholder="请输入新闻关键词"
-            style="width: 20vw"
-            clearable
-            @select="handleSelect"
-          />
-        </el-form-item>
-        <el-form-item label="起始时间" style="display: inline-block !important; margin-left:5vw">
-          <el-date-picker
-            v-model="form.startDate"
-            type="datetime"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item label="结束时间" style="display: inline-block !important">
-          <el-date-picker
-            v-model="form.endDate"
-            type="datetime"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item style="display: inline-block !important">
-          <el-button
-            type="primary"
-            size="large"
-            style="margin-left:5vw; display: inline-block !important"
-            @click="search(form)"
-          >查询</el-button>
-        </el-form-item>
-      </el-form>
-
-    </el-row>
+    <el-form
+      ref="form"
+      inline
+      :model="form"
+      style="display: flex; width: 100%"
+    >
+      <el-form-item label="新闻标题">
+        <el-autocomplete
+          v-model="form.headline"
+          :fetch-suggestions="getSuggestNews"
+          placeholder="请输入新闻关键词"
+          clearable
+          @select="handleSelect"
+        />
+      </el-form-item>
+      <el-form-item label="起始时间">
+        <el-date-picker
+          v-model="form.startDate"
+          type="datetime"
+          placeholder="选择日期"
+          value-format="yyyy-MM-dd HH:mm:ss"
+        />
+      </el-form-item>
+      <el-form-item label="结束时间">
+        <el-date-picker
+          v-model="form.endDate"
+          type="datetime"
+          placeholder="选择日期"
+          value-format="yyyy-MM-dd HH:mm:ss"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="primary"
+          size="large"
+          @click="search(form)"
+        >查询</el-button>
+      </el-form-item>
+    </el-form>
     <el-row span="20">
       <div id="chart" style="width: 80vw; height: 80vh" />
     </el-row>
@@ -77,7 +73,6 @@ export default {
     getSuggestNews(queryString, cb) {
       // mock
       mockGetSuggestNews().then(res => {
-        console.log(res)
         const results = res.data.map(item => {
           return {
             label: item.news_id,
@@ -90,7 +85,6 @@ export default {
       })
     },
     search(form) {
-      console.log(form)
       if (this.isInput) {
         const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
         const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
@@ -108,7 +102,6 @@ export default {
         //   })
         // mock
         mockGetSingleNewsFashion(start_ts, end_ts, form.newsId).then(res => {
-          console.log(res)
           this.$echarts.init(document.getElementById('chart')).setOption({
             xAxis: {
               type: 'category', // 离散数据
@@ -145,5 +138,10 @@ export default {
 </script>
 
 <style scoped>
+.el-form-item {
+  flex-shrink: 0;
+  flex-grow: 1;
+  margin-left: 50px;
+  margin-right: 50px;
+}
 </style>
-

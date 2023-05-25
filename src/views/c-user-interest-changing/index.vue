@@ -3,10 +3,11 @@
     <el-row>
       <el-form
         ref="form"
+        inline
         :model="form"
-        label-width="100px"
+        style="display: flex; width: 100%"
       >
-        <el-form-item label="用户id" style="display: inline-block !important">
+        <el-form-item label="用户id">
           <el-input-number
             v-model="form.userId"
             :max="userIdRange.max"
@@ -15,7 +16,7 @@
             style="width: 146px"
           />
         </el-form-item>
-        <el-form-item label="起始时间" style="display: inline-block !important; margin-left:5vw">
+        <el-form-item label="起始时间">
           <el-date-picker
             v-model="form.startDate"
             type="datetime"
@@ -23,7 +24,7 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           />
         </el-form-item>
-        <el-form-item label="结束时间" style="display: inline-block !important">
+        <el-form-item label="结束时间">
           <el-date-picker
             v-model="form.endDate"
             type="datetime"
@@ -31,11 +32,10 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           />
         </el-form-item>
-        <el-form-item style="display: inline-block !important">
+        <el-form-item>
           <el-button
             type="primary"
             size="large"
-            style="margin-left:5vw; display: inline-block !important"
             @click="search(form)"
           >查询</el-button>
         </el-form-item>
@@ -55,8 +55,8 @@ export default {
   data() {
     return {
       userIdRange: {
-        min: '',
-        max: ''
+        min: 0,
+        max: 0
       },
       form: {
         userId: '',
@@ -72,7 +72,6 @@ export default {
   },
   mounted() {
     mockGetUserIdRange().then(res => {
-      console.log(res)
       this.userIdRange.min = res.data[0].min_user_id
       this.userIdRange.max = res.data[0].max_user_id
     })
@@ -84,7 +83,6 @@ export default {
         const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
         // mock
         mockGetUserInterestChanging(start_ts, end_ts, form.userId).then(res => {
-          console.log(res)
           this.$echarts.init(document.getElementById('chart')).setOption({
             xAxis: {
               type: 'category', // 离散数据
@@ -121,5 +119,11 @@ export default {
 </script>
 
 <style scoped>
+.el-form-item {
+  flex-shrink: 0;
+  flex-grow: 1;
+  margin-left: 50px;
+  margin-right: 50px;
+}
 </style>
 

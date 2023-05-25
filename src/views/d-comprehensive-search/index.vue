@@ -1,78 +1,82 @@
 <template>
   <div class="app-container">
-    <el-row>
-      <el-form
-        ref="form"
-        :model="form"
-        label-width="100px"
-      >
-        <el-form-item label="用户id" style="display: inline-block !important">
-          <el-input-number
-            v-model="form.userId"
-            :max="userIdRange.max"
-            :min="userIdRange.min"
-            controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item label="起始时间" style="display: inline-block !important;">
-          <el-date-picker
-            v-model="form.startDate"
-            type="datetime"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item label="结束时间" style="display: inline-block !important">
-          <el-date-picker
-            v-model="form.endDate"
-            type="datetime"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item label="新闻标题长度" style="display: inline-block !important">
-          <el-input-number
-            v-model="form.minHeadlineLength"
-            :max="headlineLengthRange.max"
-            :min="headlineLengthRange.min"
-            controls-position="right"
-          />
-          <span style="margin-left: 10px; margin-right: 10px">至</span>
-          <el-input-number
-            v-model="form.maxHeadlineLength"
-            :max="headlineLengthRange.max"
-            :min="headlineLengthRange.min"
-            controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item label="新闻内容长度" style="display: inline-block !important">
-          <el-input-number
-            v-model="form.minContentLength"
-            :max="contentLengthRange.max"
-            :min="contentLengthRange.min"
-            controls-position="right"
-          />
-          <span style="margin-left: 10px; margin-right: 10px">至</span>
-          <el-input-number
-            v-model="form.maxContentLength"
-            :max="contentLengthRange.max"
-            :min="contentLengthRange.min"
-            controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item style="display: inline-block !important">
-          <el-button
-            type="primary"
-            size="large"
-            style="margin-left:5vw; display: inline-block !important"
-            @click="search(form)"
-          >查询</el-button>
-        </el-form-item>
-      </el-form>
+    <el-form
+      ref="form"
+      inline
+      :model="form"
+      style="display: flex; width: 100%"
+    >
+      <el-col>
+        <el-row>
+          <el-form-item label="用户id">
+            <el-input-number
+              v-model="form.userId"
+              :max="userIdRange.max"
+              :min="userIdRange.min"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item label="新闻标题长度">
+            <el-input-number
+              v-model="form.minHeadlineLength"
+              :max="headlineLengthRange.max"
+              :min="headlineLengthRange.min"
+              controls-position="right"
+            />
+            <span style="margin-left: 10px; margin-right: 10px">至</span>
+            <el-input-number
+              v-model="form.maxHeadlineLength"
+              :max="headlineLengthRange.max"
+              :min="headlineLengthRange.min"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item label="新闻内容长度">
+            <el-input-number
+              v-model="form.minContentLength"
+              :max="contentLengthRange.max"
+              :min="contentLengthRange.min"
+              controls-position="right"
+            />
+            <span style="margin-left: 10px; margin-right: 10px">至</span>
+            <el-input-number
+              v-model="form.maxContentLength"
+              :max="contentLengthRange.max"
+              :min="contentLengthRange.min"
+              controls-position="right"
+            />
+          </el-form-item>
+        </el-row>
+        <el-row style="display: flex; width: 100%">
+          <el-form-item label="起始时间" style="display: inline-block !important;">
+            <el-date-picker
+              v-model="form.startDate"
+              type="datetime"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd HH:mm:ss"
+            />
+          </el-form-item>
+          <el-form-item label="结束时间">
+            <el-date-picker
+              v-model="form.endDate"
+              type="datetime"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd HH:mm:ss"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              size="large"
+              @click="search(form)"
+            >查询</el-button>
+          </el-form-item>
+        </el-row>
+      </el-col>
+    </el-form>
 
-    </el-row>
     <el-row v-if="newsInfo.length !== 0" span="20">
-      <el-table :data="newsInfo" style="width: 100%" :default-sort="{ prop: 'news_id', order: 'ascending' }">
+      <el-table :data="newsInfo" style="width: 100%" :default-sort="{ prop: 'news_id', order: 'ascending' }" stripe>
         <el-table-column prop="news_id" label="news_id" width="180" />
         <el-table-column prop="category" label="category" width="180" />
         <el-table-column prop="topic" label="topic" width="180" />
@@ -91,10 +95,11 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-dialog :visible.sync="dialogVisible">
-      <el-text>headline: {{ headline }}</el-text>
-      <br>content:<br>
-      <el-text>{{ content }}</el-text>
+    <el-dialog :visible.sync="dialogVisible" align-center center draggable width="90%">
+      <template slot="title">
+        <span class="news-headline">{{ headline }}</span>
+      </template>
+      <span class="news-content">{{ content }}</span>
     </el-dialog>
   </div>
 </template>
@@ -107,16 +112,16 @@ export default {
   data() {
     return {
       userIdRange: {
-        min: '',
-        max: ''
+        min: 0,
+        max: 0
       },
       headlineLengthRange: {
-        min: '',
-        max: ''
+        min: 0,
+        max: 0
       },
       contentLengthRange: {
-        min: '',
-        max: ''
+        min: 0,
+        max: 0
       },
       form: {
         userId: '',
@@ -192,5 +197,27 @@ export default {
 </script>
 
 <style scoped>
+.el-form-item {
+  margin-left: 10px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.el-col > .el-row {
+  display: flex;
+  width: 100%;
+}
+.news-headline {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.news-content {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+}
 </style>
 

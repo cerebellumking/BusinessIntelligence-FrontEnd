@@ -3,11 +3,16 @@
     <el-row>
       <el-form
         ref="form"
+        inline
         :model="form"
-        label-width="100px"
+        style="display: flex; width: 100%"
       >
-        <el-form-item label="新闻种类" style="display: inline-block !important">
-          <el-select v-model="form.categorys" placeholder="请选择种类" multiple>
+        <el-form-item label="新闻种类">
+          <el-select
+            v-model="form.categorys"
+            placeholder="请选择种类"
+            multiple
+          >
             <el-option
               v-for="category in categoryList"
               :key="category"
@@ -16,7 +21,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="起始时间" style="display: inline-block !important; margin-left:5vw">
+        <el-form-item label="起始时间">
           <el-date-picker
             v-model="form.startDate"
             type="datetime"
@@ -24,7 +29,7 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           />
         </el-form-item>
-        <el-form-item label="结束时间" style="display: inline-block !important">
+        <el-form-item label="结束时间">
           <el-date-picker
             v-model="form.endDate"
             type="datetime"
@@ -32,11 +37,10 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           />
         </el-form-item>
-        <el-form-item style="display: inline-block !important">
+        <el-form-item>
           <el-button
             type="primary"
             size="large"
-            style="margin-left:5vw; display: inline-block !important"
             @click="search(form)"
           >查询</el-button>
         </el-form-item>
@@ -71,7 +75,6 @@ export default {
   mounted() {
     // mock
     mockGetAllCategoryList().then(res => {
-      console.log(res)
       this.categoryList = res.data
     }).catch(err => {
       console.log(err)
@@ -80,7 +83,6 @@ export default {
   },
   methods: {
     search(form) {
-      console.log(form)
       if (this.isInput) {
         const startDate = new Date(form.startDate.replace(' ', 'T'))
         const endDate = new Date(form.endDate.replace(' ', 'T'))
@@ -95,7 +97,6 @@ export default {
         }
         // mock
         mockGetCategoryNewsChanging(start_ts, end_ts, form.categorys).then(res => {
-          console.log(res)
           this.chartInstance.setOption({
             legend: {
               data: form.categorys,
@@ -115,7 +116,6 @@ export default {
             tooltip: {
               trigger: 'axis',
               formatter: function(params) {
-                console.log(params)
                 let tooltip = '日期: ' + params[0].name + '<br/>'
                 params.forEach(function(item) {
                   tooltip += item.seriesName + ': ' + item.value + '<br/>'
@@ -147,5 +147,11 @@ export default {
 </script>
 
 <style scoped>
+.el-form-item {
+  flex-shrink: 0;
+  flex-grow: 1;
+  margin-left: 50px;
+  margin-right: 50px;
+}
 </style>
 
