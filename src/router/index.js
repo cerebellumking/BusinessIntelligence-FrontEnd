@@ -129,6 +129,19 @@ export const constantRoutes = [
     ]
   },
 
+  {
+    path: '/dynamic-recommendation',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'dynamic-recommendation',
+        component: () => import('@/views/e-dynamic-recommendation/index'),
+        meta: { title: '实时推荐' }
+      }
+    ]
+  },
+
   // {
   //   path: '/nested',
   //   component: Layout,

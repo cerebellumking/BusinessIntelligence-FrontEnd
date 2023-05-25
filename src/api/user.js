@@ -37,3 +37,10 @@ export function mockGetUserIdRange() {
     method: 'get'
   })
 }
+
+export function mockGetUserRecommendation() {
+  return request({
+    url: '/websocket',
+    method: 'get'
+  })
+}
