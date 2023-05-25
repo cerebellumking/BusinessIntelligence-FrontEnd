@@ -48,6 +48,38 @@
           </el-form-item>
         </el-row>
         <el-row style="display: flex; width: 100%">
+          <el-form-item label="新闻种类">
+            <el-select
+              v-model="form.category"
+              placeholder="请选择种类"
+              :disabled="categoryList.length === 0"
+              clearable
+              @change="getTopicList(form.category)"
+              @clear="clearTopicList"
+            >
+              <el-option
+                v-for="category in categoryList"
+                :key="category"
+                :label="category"
+                :value="category"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="新闻主题">
+            <el-select
+              v-model="form.topic"
+              placeholder="请选择主题"
+              :disabled="topicList.length === 0"
+              clearable
+            >
+              <el-option
+                v-for="topic in topicList"
+                :key="topic"
+                :label="topic"
+                :value="topic"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="起始时间" style="display: inline-block !important;">
             <el-date-picker
               v-model="form.startDate"
@@ -75,7 +107,7 @@
       </el-col>
     </el-form>
 
-    <el-row v-if="newsInfo.length !== 0" span="20">
+    <el-row v-if="newsInfo.length !== 0">
       <el-table :data="newsInfo" style="width: 100%" :default-sort="{ prop: 'news_id', order: 'ascending' }" stripe>
         <el-table-column prop="news_id" label="news_id" width="180" />
         <el-table-column prop="category" label="category" width="180" />
@@ -105,7 +137,7 @@
 </template>
 
 <script>
-import { mockGetConprehensiveInfo, mockGetNewsHeadlineAndContentRange, mockGetNewsContent } from '@/api/news'
+import { mockGetConprehensiveInfo, mockGetNewsHeadlineAndContentRange, mockGetNewsContent, mockGetAllCategoryList, mockGetTopicOfCategory } from '@/api/news'
 import { mockGetUserIdRange } from '@/api/user'
 
 export default {
@@ -123,14 +155,18 @@ export default {
         min: 0,
         max: 0
       },
+      categoryList: [],
+      topicList: [],
       form: {
-        userId: '',
-        startDate: '',
-        endDate: '',
-        minHeadlineLength: '',
-        maxHeadlineLength: '',
-        minContentLength: '',
-        maxContentLength: ''
+        category: '',
+        topic: '',
+        userId: undefined,
+        startDate: null,
+        endDate: null,
+        minHeadlineLength: undefined,
+        maxHeadlineLength: undefined,
+        minContentLength: undefined,
+        maxContentLength: undefined
       },
       newsInfo: [],
       dialogVisible: false,
@@ -138,13 +174,13 @@ export default {
       content: ''
     }
   },
-  computed: {
-    isInput() {
-      // return this.form.userId !== '' && this.form.startDate !== '' && this.form.endDate !== ''
-      return true
-    }
-  },
   mounted() {
+    // mock
+    mockGetAllCategoryList().then(res => {
+      this.categoryList = res.data
+    }).catch(err => {
+      console.log(err)
+    })
     mockGetUserIdRange().then(res => {
       this.userIdRange.min = res.data[0].min_user_id
       this.userIdRange.max = res.data[0].max_user_id
@@ -162,26 +198,47 @@ export default {
   },
   methods: {
     search(form) {
-      if (this.isInput) {
-        const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
-        const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
-        // mock
-        mockGetConprehensiveInfo(
-          start_ts, end_ts,
-          form.userId, form.category,
-          form.minHeadlineLength, form.maxHeadlineLength,
-          form.minContentLength, form.maxContentLength)
-          .then(res => {
-            this.newsInfo = res.data
-          }).catch(err => {
-            console.log(err)
-          })
-      } else {
+      console.log(form)
+      const start_ts = form.startDate !== null ? Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000 : ''
+      const end_ts = form.endDate !== null ? Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000 : ''
+      const userId = form.userId === undefined ? '' : form.userId
+      const category = form.category === undefined ? '' : form.category
+      const topic = form.topic === undefined ? '' : form.topic
+      const minHeadlineLength = form.minHeadlineLength === undefined ? '' : form.minHeadlineLength
+      const maxHeadlineLength = form.maxHeadlineLength === undefined ? '' : form.maxHeadlineLength
+      const minContentLength = form.minContentLength === undefined ? '' : form.minContentLength
+      const maxContentLength = form.maxContentLength === undefined ? '' : form.maxContentLength
+      if (start_ts !== '' && end_ts !== '' && start_ts > end_ts) {
         this.$message({
-          message: '请填写完整信息',
-          type: 'warning'
+          message: '起始时间不能大于结束时间',
+          type: 'error'
         })
+        return
       }
+      if (minHeadlineLength !== '' && maxHeadlineLength !== '' && minHeadlineLength > maxHeadlineLength) {
+        this.$message({
+          message: '标题最小长度不能大于标题最大长度',
+          type: 'error'
+        })
+        return
+      }
+      if (minContentLength !== '' && maxContentLength !== '' && minContentLength > maxContentLength) {
+        this.$message({
+          message: '内容最小长度不能大于内容最大长度',
+          type: 'error'
+        })
+        return
+      }
+      mockGetConprehensiveInfo(
+        start_ts, end_ts,
+        userId, category, topic,
+        minHeadlineLength, maxHeadlineLength,
+        minContentLength, maxContentLength)
+        .then(res => {
+          this.newsInfo = res.data
+        }).catch(err => {
+          console.log(err)
+        })
     },
     goNewsContent(row) {
       mockGetNewsContent(row.news_id).then(res => {
@@ -191,6 +248,24 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    getTopicList(category) {
+      if (category === '') {
+        this.topicList = []
+        return
+      }
+      mockGetTopicOfCategory(category).then(res => {
+        console.log(res)
+        this.topicList = res.data
+        console.log(this.topicList)
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    clearTopicList() {
+      this.form.category = ''
+      this.topicList = []
+      this.form.topic = ''
     }
   }
 }
