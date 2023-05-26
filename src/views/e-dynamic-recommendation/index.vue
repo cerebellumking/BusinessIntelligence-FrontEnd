@@ -3,19 +3,10 @@
     <el-row>
       <el-form inline>
         <el-form-item label="用户id">
-          <el-input-number
-            v-model="userId"
-            :max="userIdRange.max"
-            :min="userIdRange.min"
-            controls-position="right"
-          />
+          <el-input-number v-model="userId" :max="userIdRange.max" :min="userIdRange.min" controls-position="right" />
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="large"
-            @click="search()"
-          >查询</el-button>
+          <el-button type="primary" size="large" @click="search()">查询</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -27,12 +18,7 @@
         <el-table-column prop="date" label="date" width="180" />
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click.prevent="goNewsContent(scope.row)"
-            >
+            <el-button link type="primary" size="small" @click.prevent="goNewsContent(scope.row)">
               查看详细
             </el-button>
           </template>
@@ -48,12 +34,7 @@
         <el-table-column prop="headline" label="headline" />
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click.prevent="goNewsContent(scope.row)"
-            >
+            <el-button link type="primary" size="small" @click.prevent="goNewsContent(scope.row)">
               查看详细
             </el-button>
           </template>
@@ -72,7 +53,7 @@
 <script>
 import { mockGetNewsContent } from '@/api/news'
 import { mockGetUserIdRange, mockGetUserRecommendation } from '@/api/user'
-
+let websocket = null
 export default {
   data() {
     return {
@@ -103,15 +84,45 @@ export default {
     }).catch(err => {
       console.log(err)
     })
+    if (this.isInput) {
+
+    }
+
+
   },
   methods: {
     search() {
       if (this.isInput) {
         // mock
-        mockGetUserRecommendation(this.userId)
-          .then(res => {
-            this.newsRecommended = res.data.news
-            this.newsClicked = res.data.clicks.map(item => {
+        // mockGetUserRecommendation(this.userId)
+        //   .then(res => {
+        //     this.newsRecommended = res.data.news
+        //     this.newsClicked = res.data.clicks.map(item => {
+        //       return {
+        //         news_id: item.news_id,
+        //         headline: item.headline,
+        //         date: new Date(item.start_ts * 1000)
+        //           .toISOString()
+        //           .replace('T', ' ').replace('Z', '')
+        //           .slice(0, -4)
+        //       }
+        //     })
+        //   }).catch(err => {
+        //     console.log(err)
+        //   })
+        websocket = new WebSocket('ws://127.0.0.1:8081/websocket/' + this.userId)
+        websocket.onopen = () => {
+          console.log('websocket open')
+        }
+        websocket.onmessage = (res) => {
+          console.log('收到消息')
+          res = JSON.parse(res.data)
+          console.log(res)
+          this.newsRecommended = res.news
+          if (res.clicks == null) {
+            this.newsClicked = []
+          } else {
+            this.newsClicked = res.clicks.map(item => {
               return {
                 news_id: item.news_id,
                 headline: item.headline,
@@ -121,9 +132,22 @@ export default {
                   .slice(0, -4)
               }
             })
-          }).catch(err => {
-            console.log(err)
-          })
+          }
+        }
+        const sendWebSocketMessage = () => {
+          if (websocket.readyState === WebSocket.OPEN) {
+            console.log('发送消息');
+            websocket.send('hello');
+          }
+        };
+
+        const sendInterval = setInterval(sendWebSocketMessage, 5000);
+
+        // 当连接关闭时清除定时器
+        websocket.onclose = () => {
+          clearInterval(sendInterval);
+        };
+
       } else {
         this.$message({
           message: '请填写完整信息',
@@ -154,12 +178,14 @@ export default {
 .el-form-item {
   margin-left: 10px;
   margin-right: 10px;
-flex-shrink: 0;
+  flex-shrink: 0;
 }
-.el-col > .el-row {
+
+.el-col>.el-row {
   display: flex;
   width: 100%;
 }
+
 .news-headline {
   font-size: 20px;
   font-weight: bold;
