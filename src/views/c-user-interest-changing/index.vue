@@ -71,18 +71,35 @@ export default {
     }
   },
   mounted() {
-    mockGetUserIdRange().then(res => {
+    this.$axios({
+      url: '/range/userid',
+      method: 'get'
+    }).then(res => {
       this.userIdRange.min = res.data[0].min_user_id
       this.userIdRange.max = res.data[0].max_user_id
+    }).catch(err => {
+      console.log(err)
     })
+    // mockGetUserIdRange().then(res => {
+    //   this.userIdRange.min = res.data[0].min_user_id
+    //   this.userIdRange.max = res.data[0].max_user_id
+    // })
   },
   methods: {
     search(form) {
       if (this.isInput) {
         const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
         const end_ts = Date.parse(new Date(form.endDate.replace(' ', 'T'))) / 1000
-        // mock
-        mockGetUserInterestChanging(start_ts, end_ts, form.userId).then(res => {
+        this.$axios({
+          url: '/user/interest',
+          method: 'get',
+          params: {
+            start_ts: start_ts,
+            end_ts: end_ts,
+            user_id: form.userId
+          }
+        }).then(res => {
+          console.log(res.data.map(item => item.category))
           this.$echarts.init(document.getElementById('chart')).setOption({
             xAxis: {
               type: 'category', // 离散数据
@@ -107,12 +124,46 @@ export default {
         }).catch(err => {
           console.log(err)
         })
-      } else {
+      }
+        else {
         this.$message({
           message: '请填写完整信息',
           type: 'warning'
         })
       }
+        
+        // mock
+      //   mockGetUserInterestChanging(start_ts, end_ts, form.userId).then(res => {
+      //     this.$echarts.init(document.getElementById('chart')).setOption({
+      //       xAxis: {
+      //         type: 'category', // 离散数据
+      //         data: res.data.map(item => item.category),
+      //         name: '类别'
+      //       },
+      //       yAxis: {
+      //         type: 'value'
+      //       },
+      //       tooltip: {
+      //         trigger: 'axis', // 设置触发类型为坐标轴轴线触发
+      //         formatter: '{b}: {c}' // 自定义工具提示的内容格式
+      //       },
+      //       series: [
+      //         {
+      //           data: res.data.map(item => item.count),
+      //           type: 'line',
+      //           smooth: true
+      //         }
+      //       ]
+      //     })
+      //   }).catch(err => {
+      //     console.log(err)
+      //   })
+      // } else {
+      //   this.$message({
+      //     message: '请填写完整信息',
+      //     type: 'warning'
+      //   })
+      // }
     }
   }
 }

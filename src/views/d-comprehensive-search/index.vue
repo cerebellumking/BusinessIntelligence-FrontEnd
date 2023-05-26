@@ -175,19 +175,27 @@ export default {
     }
   },
   mounted() {
-    // mock
-    mockGetAllCategoryList().then(res => {
+    this.$axios({
+      method: 'get',
+      url: 'category'
+    }).then(res => {
       this.categoryList = res.data
     }).catch(err => {
       console.log(err)
     })
-    mockGetUserIdRange().then(res => {
+    this.$axios({
+      url: '/range/userid',
+      method: 'get'
+    }).then(res => {
       this.userIdRange.min = res.data[0].min_user_id
       this.userIdRange.max = res.data[0].max_user_id
     }).catch(err => {
       console.log(err)
     })
-    mockGetNewsHeadlineAndContentRange().then(res => {
+    this.$axios({
+      url: '/range/length',
+      method: 'get'
+    }).then(res => {
       this.headlineLengthRange.min = res.data[0].min_headline_length
       this.headlineLengthRange.max = res.data[0].max_headline_length
       this.contentLengthRange.min = res.data[0].min_content_length
@@ -195,6 +203,26 @@ export default {
     }).catch(err => {
       console.log(err)
     })
+    // mock
+    // mockGetAllCategoryList().then(res => {
+    //   this.categoryList = res.data
+    // }).catch(err => {
+    //   console.log(err)
+    // })
+    // mockGetUserIdRange().then(res => {
+    //   this.userIdRange.min = res.data[0].min_user_id
+    //   this.userIdRange.max = res.data[0].max_user_id
+    // }).catch(err => {
+    //   console.log(err)
+    // })
+    // mockGetNewsHeadlineAndContentRange().then(res => {
+    //   this.headlineLengthRange.min = res.data[0].min_headline_length
+    //   this.headlineLengthRange.max = res.data[0].max_headline_length
+    //   this.contentLengthRange.min = res.data[0].min_content_length
+    //   this.contentLengthRange.max = res.data[0].max_content_length
+    // }).catch(err => {
+    //   console.log(err)
+    // })
   },
   methods: {
     search(form) {
@@ -229,38 +257,84 @@ export default {
         })
         return
       }
-      mockGetConprehensiveInfo(
-        start_ts, end_ts,
-        userId, category, topic,
-        minHeadlineLength, maxHeadlineLength,
-        minContentLength, maxContentLength)
-        .then(res => {
+      this.$axios({
+      url: '/comprehensive',
+      params: {
+        start_ts: start_ts,
+        end_ts: end_ts,
+        min_user_id: userId,
+        max_user_id: userId,
+        category: category,
+        topic: topic,
+        min_headline_length: minHeadlineLength,
+        max_headline_length: maxHeadlineLength,
+        min_content_length: minContentLength,
+        max_content_length: maxContentLength
+      },
+      method: 'get'
+    }).then(res => {
           this.newsInfo = res.data
         }).catch(err => {
           console.log(err)
         })
+      // mockGetConprehensiveInfo(
+      //   start_ts, end_ts,
+      //   userId, category, topic,
+      //   minHeadlineLength, maxHeadlineLength,
+      //   minContentLength, maxContentLength)
+      //   .then(res => {
+      //     this.newsInfo = res.data
+      //   }).catch(err => {
+      //     console.log(err)
+      //   })
     },
     goNewsContent(row) {
-      mockGetNewsContent(row.news_id).then(res => {
+      this.$axios({
+        url: '/news/content',
+        params: {
+          news_id: row.news_id
+        },
+        method: 'get'
+      }).then(res => {
         this.headline = row.headline
         this.content = res.data.content
         this.dialogVisible = true
       }).catch(err => {
         console.log(err)
       })
+      // mockGetNewsContent(row.news_id).then(res => {
+      //   this.headline = row.headline
+      //   this.content = res.data.content
+      //   this.dialogVisible = true
+      // }).catch(err => {
+      //   console.log(err)
+      // })
     },
     getTopicList(category) {
       if (category === '') {
         this.topicList = []
         return
       }
-      mockGetTopicOfCategory(category).then(res => {
+      this.$axios({
+        url: '/topic',
+        params: {
+          category: category
+        },
+        method: 'get'
+      }).then(res => {
         console.log(res)
         this.topicList = res.data
         console.log(this.topicList)
       }).catch(err => {
         console.log(err)
       })
+      // mockGetTopicOfCategory(category).then(res => {
+      //   console.log(res)
+      //   this.topicList = res.data
+      //   console.log(this.topicList)
+      // }).catch(err => {
+      //   console.log(err)
+      // })
     },
     clearTopicList() {
       this.form.category = ''

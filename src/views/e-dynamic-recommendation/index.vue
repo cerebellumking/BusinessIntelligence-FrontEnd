@@ -94,7 +94,10 @@ export default {
     }
   },
   mounted() {
-    mockGetUserIdRange().then(res => {
+    this.$axios({
+      url: '/range/userid',
+      method: 'get'
+    }).then(res => {
       this.userIdRange.min = res.data[0].min_user_id
       this.userIdRange.max = res.data[0].max_user_id
     }).catch(err => {
@@ -129,7 +132,13 @@ export default {
       }
     },
     goNewsContent(row) {
-      mockGetNewsContent(row.news_id).then(res => {
+      this.$axios({
+        url: '/news/content',
+        params: {
+          news_id: row.news_id
+        },
+        method: 'get'
+      }).then(res => {
         this.headline = row.headline
         this.content = res.data.content
         this.dialogVisible = true

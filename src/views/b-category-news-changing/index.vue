@@ -73,14 +73,25 @@ export default {
     }
   },
   mounted() {
-    // mock
-    mockGetAllCategoryList().then(res => {
+    this.$axios({
+      method: 'get',
+      url: 'category'
+    }).then(res => {
+      console.log(res.data)
       this.categoryList = res.data
     }).catch(err => {
       console.log(err)
     })
     this.chartInstance = this.$echarts.init(document.getElementById('chart'))
   },
+    // mock
+  //   mockGetAllCategoryList().then(res => {
+  //     this.categoryList = res.data
+  //   }).catch(err => {
+  //     console.log(err)
+  //   })
+  //   this.chartInstance = this.$echarts.init(document.getElementById('chart'))
+  // },
   methods: {
     search(form) {
       if (this.isInput) {
@@ -95,8 +106,16 @@ export default {
           _date = new Date(_date.getFullYear(), _date.getMonth(), _date.getDate() + 1)
           dateList.push(_date.toISOString().split('T')[0])
         }
-        // mock
-        mockGetCategoryNewsChanging(start_ts, end_ts, form.categorys).then(res => {
+        console.log(form.categorys)
+        this.$axios({
+          method: 'get',
+          url: '/news/category',
+          params: {
+            start_ts: start_ts,
+            end_ts: end_ts,
+            categorys: form.categorys
+          }
+        }).then(res => {
           this.chartInstance.setOption({
             legend: {
               data: form.categorys,
@@ -135,6 +154,46 @@ export default {
         }).catch(err => {
           console.log(err)
         })
+        // mock
+        // mockGetCategoryNewsChanging(start_ts, end_ts, form.categorys).then(res => {
+        //   this.chartInstance.setOption({
+        //     legend: {
+        //       data: form.categorys,
+        //       bottom: 'bottom',
+        //       left: 'center'
+        //     },
+        //     xAxis: {
+        //       type: 'category', // 离散数据
+        //       data: dateList,
+        //       name: '日期'
+        //     },
+        //     yAxis: form.categorys.map(item => {
+        //       return {
+        //         type: 'value'
+        //       }
+        //     }),
+        //     tooltip: {
+        //       trigger: 'axis',
+        //       formatter: function(params) {
+        //         let tooltip = '日期: ' + params[0].name + '<br/>'
+        //         params.forEach(function(item) {
+        //           tooltip += item.seriesName + ': ' + item.value + '<br/>'
+        //         })
+        //         return tooltip
+        //       }
+        //     },
+        //     series: form.categorys.map((item) => {
+        //       return {
+        //         name: item,
+        //         type: 'line',
+        //         data: res.data[item],
+        //         smooth: true
+        //       }
+        //     })
+        //   })
+        // }).catch(err => {
+        //   console.log(err)
+        // })
       } else {
         this.$message({
           message: '请填写完整信息',
