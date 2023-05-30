@@ -2,8 +2,13 @@
   <div class="app-container">
     <el-form ref="form" inline :model="form" style="display: flex; width: 100%">
       <el-form-item label="新闻标题">
-        <el-autocomplete v-model="form.headline" :fetch-suggestions="getSuggestNews" placeholder="请输入新闻关键词" clearable
-          @select="handleSelect" />
+        <el-autocomplete
+          v-model="form.headline"
+          :fetch-suggestions="getSuggestNews"
+          placeholder="请输入新闻关键词"
+          clearable
+          @select="handleSelect"
+        />
       </el-form-item>
       <el-form-item label="起始时间">
         <el-date-picker v-model="form.startDate" type="datetime" placeholder="选择日期" value-format="yyyy-MM-dd HH:mm:ss" />
@@ -22,9 +27,6 @@
 </template>
 
 <script>
-import { mockGetSuggestNews } from '@/api/suggest'
-import { mockGetSingleNewsFashion } from '@/api/news'
-
 export default {
   data() {
     return {
@@ -65,19 +67,6 @@ export default {
           console.log(err)
         })
     },
-    // mock
-    //   mockGetSuggestNews().then(res => {
-    //     const results = res.data.map(item => {
-    //       return {
-    //         label: item.news_id,
-    //         value: item.headline
-    //       }
-    //     })
-    //     cb(results)
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // },
     search(form) {
       if (this.isInput) {
         const start_ts = Date.parse(new Date(form.startDate.replace(' ', 'T'))) / 1000
@@ -90,69 +79,37 @@ export default {
               news_id: form.newsId
             }
           }).then(res => {
-          console.log(res)
-          this.$echarts.init(document.getElementById('chart')).setOption({
-            xAxis: {
-              type: 'category', // 离散数据
-              data: res.data.map(item => item.date),
-              name: '日期'
-            },
-            yAxis: {
-              type: 'value'
-            },
-            tooltip: {
-              trigger: 'axis', // 设置触发类型为坐标轴轴线触发
-              formatter: '{b}: {c}' // 自定义工具提示的内容格式
-            },
-            series: [
-              {
-                data: res.data.map(item => item.count),
-                type: 'line',
-                smooth: true
-              }
-            ]
+            console.log(res)
+            this.$echarts.init(document.getElementById('chart')).setOption({
+              xAxis: {
+                type: 'category', // 离散数据
+                data: res.data.map(item => item.date),
+                name: '日期'
+              },
+              yAxis: {
+                type: 'value'
+              },
+              tooltip: {
+                trigger: 'axis', // 设置触发类型为坐标轴轴线触发
+                formatter: '{b}: {c}' // 自定义工具提示的内容格式
+              },
+              series: [
+                {
+                  data: res.data.map(item => item.count),
+                  type: 'line',
+                  smooth: true
+                }
+              ]
+            })
+          }).catch(err => {
+            console.log(err)
           })
-        }).catch(err => {
-          console.log(err)
-        })
       } else {
         this.$message({
           message: '请填写完整信息',
           type: 'warning'
         })
       }
-        // mock
-      //   mockGetSingleNewsFashion(start_ts, end_ts, form.newsId).then(res => {
-      //     this.$echarts.init(document.getElementById('chart')).setOption({
-      //       xAxis: {
-      //         type: 'category', // 离散数据
-      //         data: res.data.map(item => item.date),
-      //         name: '日期'
-      //       },
-      //       yAxis: {
-      //         type: 'value'
-      //       },
-      //       tooltip: {
-      //         trigger: 'axis', // 设置触发类型为坐标轴轴线触发
-      //         formatter: '{b}: {c}' // 自定义工具提示的内容格式
-      //       },
-      //       series: [
-      //         {
-      //           data: res.data.map(item => item.count),
-      //           type: 'line',
-      //           smooth: true
-      //         }
-      //       ]
-      //     })
-      //   }).catch(err => {
-      //     console.log(err)
-      //   })
-      // } else {
-      //   this.$message({
-      //     message: '请填写完整信息',
-      //     type: 'warning'
-      //   })
-      // }
     }
   }
 }

@@ -137,9 +137,6 @@
 </template>
 
 <script>
-import { mockGetConprehensiveInfo, mockGetNewsHeadlineAndContentRange, mockGetNewsContent, mockGetAllCategoryList, mockGetTopicOfCategory } from '@/api/news'
-import { mockGetUserIdRange } from '@/api/user'
-
 export default {
   data() {
     return {
@@ -203,26 +200,6 @@ export default {
     }).catch(err => {
       console.log(err)
     })
-    // mock
-    // mockGetAllCategoryList().then(res => {
-    //   this.categoryList = res.data
-    // }).catch(err => {
-    //   console.log(err)
-    // })
-    // mockGetUserIdRange().then(res => {
-    //   this.userIdRange.min = res.data[0].min_user_id
-    //   this.userIdRange.max = res.data[0].max_user_id
-    // }).catch(err => {
-    //   console.log(err)
-    // })
-    // mockGetNewsHeadlineAndContentRange().then(res => {
-    //   this.headlineLengthRange.min = res.data[0].min_headline_length
-    //   this.headlineLengthRange.max = res.data[0].max_headline_length
-    //   this.contentLengthRange.min = res.data[0].min_content_length
-    //   this.contentLengthRange.max = res.data[0].max_content_length
-    // }).catch(err => {
-    //   console.log(err)
-    // })
   },
   methods: {
     search(form) {
@@ -258,25 +235,25 @@ export default {
         return
       }
       this.$axios({
-      url: '/comprehensive',
-      params: {
-        start_ts: start_ts,
-        end_ts: end_ts,
-        min_user_id: userId,
-        max_user_id: userId,
-        category: category,
-        topic: topic,
-        min_headline_length: minHeadlineLength,
-        max_headline_length: maxHeadlineLength,
-        min_content_length: minContentLength,
-        max_content_length: maxContentLength
-      },
-      method: 'get'
-    }).then(res => {
-          this.newsInfo = res.data
-        }).catch(err => {
-          console.log(err)
-        })
+        url: '/comprehensive',
+        params: {
+          start_ts: start_ts,
+          end_ts: end_ts,
+          min_user_id: userId,
+          max_user_id: userId,
+          category: category,
+          topic: topic,
+          min_headline_length: minHeadlineLength,
+          max_headline_length: maxHeadlineLength,
+          min_content_length: minContentLength,
+          max_content_length: maxContentLength
+        },
+        method: 'get'
+      }).then(res => {
+        this.newsInfo = res.data
+      }).catch(err => {
+        console.log(err)
+      })
       // mockGetConprehensiveInfo(
       //   start_ts, end_ts,
       //   userId, category, topic,

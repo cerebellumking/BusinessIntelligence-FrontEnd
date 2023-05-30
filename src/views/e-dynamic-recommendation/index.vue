@@ -51,8 +51,6 @@
 </template>
 
 <script>
-import { mockGetNewsContent } from '@/api/news'
-import { mockGetUserIdRange, mockGetUserRecommendation } from '@/api/user'
 let websocket = null
 export default {
   data() {
@@ -84,32 +82,10 @@ export default {
     }).catch(err => {
       console.log(err)
     })
-    if (this.isInput) {
-
-    }
-
-
   },
   methods: {
     search() {
       if (this.isInput) {
-        // mock
-        // mockGetUserRecommendation(this.userId)
-        //   .then(res => {
-        //     this.newsRecommended = res.data.news
-        //     this.newsClicked = res.data.clicks.map(item => {
-        //       return {
-        //         news_id: item.news_id,
-        //         headline: item.headline,
-        //         date: new Date(item.start_ts * 1000)
-        //           .toISOString()
-        //           .replace('T', ' ').replace('Z', '')
-        //           .slice(0, -4)
-        //       }
-        //     })
-        //   }).catch(err => {
-        //     console.log(err)
-        //   })
         websocket = new WebSocket('ws://127.0.0.1:8081/websocket/' + this.userId)
         websocket.onopen = () => {
           console.log('websocket open')
@@ -136,18 +112,17 @@ export default {
         }
         const sendWebSocketMessage = () => {
           if (websocket.readyState === WebSocket.OPEN) {
-            console.log('发送消息');
-            websocket.send('hello');
+            console.log('发送消息')
+            websocket.send('hello')
           }
-        };
+        }
 
-        const sendInterval = setInterval(sendWebSocketMessage, 5000);
+        const sendInterval = setInterval(sendWebSocketMessage, 5000)
 
         // 当连接关闭时清除定时器
         websocket.onclose = () => {
-          clearInterval(sendInterval);
-        };
-
+          clearInterval(sendInterval)
+        }
       } else {
         this.$message({
           message: '请填写完整信息',
