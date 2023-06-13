@@ -12,7 +12,7 @@
     </el-row>
     <el-row v-if="newsClicked.length !== 0">
       <el-divider>历史点击记录</el-divider>
-      <el-table :data="newsClicked" style="width: 100%; height: 500px" max-height="500px" stripe>
+      <el-table :data="newsClicked" style="width: 100%; height: 'auto'" max-height="500px" stripe>
         <el-table-column prop="news_id" label="news_id" width="180" />
         <el-table-column prop="headline" label="headline" />
         <el-table-column prop="date" label="date" width="180" />
